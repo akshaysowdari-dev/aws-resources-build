@@ -86,7 +86,7 @@ pipeline {
                     '''
                 }
 
-                echo 'AWS Test Stage Completed'
+                echo 'AWS Test Stage 2 Completed'
             }
         }
 
