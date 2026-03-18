@@ -52,12 +52,11 @@
 
 
 
-
-
 pipeline {
     agent any
 
     stages {
+
         stage('Test Git') {
             steps {
                 echo 'Git connected successfully'
@@ -66,13 +65,30 @@ pipeline {
 
         stage('Test AWS') {
             steps {
+                echo 'Starting AWS Test Stage...'
+
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
+                    credentialsId: 'aws-dev-creds'
                 ]]) {
-                    sh 'aws s3 ls'
+
+                    echo 'AWS credentials injected successfully'
+
+                    sh '''
+                        echo "Current user:"
+                        whoami
+
+                        echo "AWS CLI version:"
+                        aws --version
+
+                        echo "Listing S3 buckets:"
+                        aws s3 ls
+                    '''
                 }
+
+                echo 'AWS Test Stage Completed'
             }
         }
+
     }
 }
