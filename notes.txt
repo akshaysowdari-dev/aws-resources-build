@@ -1,0 +1,71 @@
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker --version
+Docker version 29.2.1, build a5c7197
+
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker run -d `
+>>   -p 8080:8080 `
+>>   -p 50000:50000 `
+>>   --name jenkins `
+>>   jenkins/jenkins:lts
+Unable to find image 'jenkins/jenkins:lts' locally
+lts: Pulling from jenkins/jenkins
+1354b1aa1de9: Pull complete
+5681e84d3308: Pull complete
+3c9c60b56010: Pull complete
+0c31487ae971: Pull complete
+f703dc66a915: Pull complete
+53c88f1dfeb7: Pull complete
+967448ab02b6: Pull complete
+f63b11f22c5e: Pull complete
+650135881854: Pull complete
+7eb8b3c92c00: Pull complete
+a2375046a225: Pull complete
+24446a3ce816: Pull complete
+9b156237551b: Download complete
+Digest: sha256:23b84d1066dbe69f2c17288c83ac071127092d726f14b3b80444d868468619c7
+Status: Downloaded newer image for jenkins/jenkins:lts
+397c6b3447737db3cda8987da4eab829c5fd4cf73a292f283d5ea022f2053bd7
+
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker ps
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS          PORTS                                                                                          NAMES
+397c6b344773   jenkins/jenkins:lts   "/usr/bin/tini -- /u…"   50 seconds ago   Up 44 seconds   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp, 0.0.0.0:50000->50000/tcp, [::]:50000->50000/tcp   jenkins
+
+
+
+
+
+
+
+
+
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker ps -a
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS                     PORTS     NAMES
+397c6b344773   jenkins/jenkins:lts   "/usr/bin/tini -- /u…"   16 minutes ago   Exited (5) 4 minutes ago             jenkins
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker start jenkins
+jenkins
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker ps
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS         PORTS                   
+                                                                       NAMES
+397c6b344773   jenkins/jenkins:lts   "/usr/bin/tini -- /u…"   16 minutes ago   Up 6 seconds   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp, 0.0.0.0:50000->50000/tcp, [::]:50000->50000/tcp   jenkins
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker exec -it jenkins bash
+jenkins@397c6b344773:/$ apt update
+Error: List directory /var/lib/apt/lists/partial is missing. - Acquire (13: Permission denied)
+jenkins@397c6b344773:/$ apt install -y wget unzip awscli
+Error: Could not open lock file /var/lib/dpkg/lock-frontend - open (13: Permission denied)
+Error: Unable to acquire the dpkg frontend lock (/var/lib/dpkg/lock-frontend), are you root?
+jenkins@397c6b344773:/$ exit
+exit
+PS C:\Users\sowda\OneDrive\Documents\Github\aws-resources-build> docker exec -u root -it jenkins bash
+root@397c6b344773:/# apt update
+
+
+
+
+
+
+
+
+
+

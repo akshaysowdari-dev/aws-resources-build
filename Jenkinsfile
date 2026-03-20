@@ -1,94 +1,56 @@
-// pipeline {
-//   agent any
-
-//   environment {
-//     AWS_REGION = 'ap-south-2'
-//   }
-
-//   stages {
-
-//     stage('Checkout') {
-//       steps {
-//         git branch: "${env.BRANCH_NAME}", url: 'https://github.com/akshaysowdari-dev/aws-resources-build'
-//       }
-//     }
-
-//     stage('Set Environment') {
-//       steps {
-//         script {
-//           if (env.BRANCH_NAME == 'develop') {
-//             ENV = "dev"
-//           } else if (env.BRANCH_NAME == 'test') {
-//             ENV = "qa"
-//           } else {
-//             error "Unsupported branch"
-//           }
-//         }
-//       }
-//     }
-
-//     stage('Deploy Infra') {
-//       steps {
-//         withCredentials([[
-//           $class: 'AmazonWebServicesCredentialsBinding',
-//           credentialsId: 'aws-dev-creds'
-//         ]]) {
-
-//           sh """
-//           export AWS_DEFAULT_REGION=${AWS_REGION}
-
-//           cd config
-
-//           ENV=${ENV} terragrunt init
-//           ENV=${ENV} terragrunt apply -auto-approve
-//           """
-//         }
-//       }
-//     }
-
-//   }
-// }
-
-
-
-
 pipeline {
     agent any
 
     stages {
 
-        stage('Test Git') {
+        stage('Checkout') {
             steps {
-                echo 'Git connected successfully'
+                checkout scm
             }
         }
 
-        stage('Test AWS') {
+        stage('Detect Environment') {
             steps {
-                echo 'Starting AWS Test Stage...'
+                script {
+                    if (env.BRANCH_NAME == 'develop') {
+                        env.ENV_FOLDER = 'dev'
+                        env.AWS_CREDS = 'aws-dev-creds'
+                    } 
+                    else if (env.BRANCH_NAME == 'qa') {
+                        env.ENV_FOLDER = 'qa'
+                        env.AWS_CREDS = 'aws-qa-creds'
+                    } 
+                    else {
+                        error "Branch not allowed for deployment"
+                    }
 
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-dev-creds'
-                ]]) {
-
-                    echo 'AWS credentials injected successfully'
-
-                    sh '''
-                        echo "Current user:"
-                        whoami
-
-                        echo "AWS CLI version:"
-                        aws --version
-
-                        echo "Listing S3 buckets:"
-                        aws s3 ls
-                    '''
+                    echo "Branch: ${env.BRANCH_NAME}"
+                    echo "Environment: ${env.ENV_FOLDER}"
+                    echo "Using AWS creds: ${env.AWS_CREDS}"
                 }
-
-                echo 'AWS Test Stage 55 Completed'
             }
         }
 
+        stage('Deploy Infrastructure') {
+            steps {
+                script {
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: env.AWS_CREDS
+                    ]]) {
+
+                        sh '''
+                            echo "Running Terragrunt for $ENV_FOLDER"
+
+                            cd env/$ENV_FOLDER
+
+                            terragrunt init
+                            terragrunt plan
+                            terragrunt apply -auto-approve
+                        '''
+                    }
+                }
+            }
+        }
     }
 }
