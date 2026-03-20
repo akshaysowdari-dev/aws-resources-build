@@ -9,46 +9,66 @@ pipeline {
             }
         }
 
-        stage('Detect Environment') {
+        stage('Set Env') {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'develop') {
-                        env.ENV_FOLDER = 'dev'
+                        env.TF_VAR_env = 'dev'
                         env.AWS_CREDS = 'aws-dev-creds'
-                    } 
-                    else if (env.BRANCH_NAME == 'qa') {
-                        env.ENV_FOLDER = 'qa'
+                    } else if (env.BRANCH_NAME == 'qa') {
+                        env.TF_VAR_env = 'qa'
                         env.AWS_CREDS = 'aws-qa-creds'
-                    } 
-                    else {
-                        error "Branch not allowed for deployment"
                     }
-
-                    echo "Branch: ${env.BRANCH_NAME}"
-                    echo "Environment: ${env.ENV_FOLDER}"
-                    echo "Using AWS creds: ${env.AWS_CREDS}"
                 }
             }
         }
 
-        stage('Deploy Infrastructure') {
+        stage('Deploy Infra') {
             steps {
-                script {
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: env.AWS_CREDS
-                    ]]) {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: env.AWS_CREDS
+                ]]) {
 
-                        sh '''
-                            echo "Running Terragrunt for $ENV_FOLDER"
+                    sh '''
+                        cd module/aws/dynamodb-table
+                        terragrunt apply -auto-approve
 
-                            cd env/$ENV_FOLDER
+                        cd ../s3-repo-replica
+                        terragrunt apply -auto-approve
+                    '''
+                }
+            }
+        }
 
-                            terragrunt init
-                            terragrunt plan
-                            terragrunt apply -auto-approve
-                        '''
-                    }
+        stage('Upload Repo to S3') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: env.AWS_CREDS
+                ]]) {
+
+                    sh '''
+                        aws s3 sync . s3://repo-replica-$TF_VAR_env/
+                    '''
+                }
+            }
+        }
+
+        stage('Load CSV to DynamoDB') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: env.AWS_CREDS
+                ]]) {
+
+                    sh '''
+                        cd module/aws/csv-to-dynamodb-job
+
+                        pip install -r requirements.txt
+
+                        python load_to_dynamodb.py
+                    '''
                 }
             }
         }
