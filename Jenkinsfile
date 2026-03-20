@@ -15,10 +15,18 @@ pipeline {
                     if (env.BRANCH_NAME == 'develop') {
                         env.TF_VAR_env = 'dev'
                         env.AWS_CREDS = 'aws-dev-creds'
-                    } else if (env.BRANCH_NAME == 'qa') {
+                    } 
+                    else if (env.BRANCH_NAME == 'qa') {
                         env.TF_VAR_env = 'qa'
                         env.AWS_CREDS = 'aws-qa-creds'
+                    } 
+                    else {
+                        error "Unsupported branch: ${env.BRANCH_NAME}"
                     }
+
+                    echo "Branch: ${env.BRANCH_NAME}"
+                    echo "Env: ${env.TF_VAR_env}"
+                    echo "AWS Creds: ${env.AWS_CREDS}"
                 }
             }
         }
@@ -29,7 +37,6 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: env.AWS_CREDS
                 ]]) {
-
                     sh '''
                         cd module/aws/dynamodb-table
                         terragrunt apply -auto-approve
@@ -47,7 +54,6 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: env.AWS_CREDS
                 ]]) {
-
                     sh '''
                         aws s3 sync . s3://repo-replica-$TF_VAR_env/
                     '''
@@ -61,16 +67,15 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: env.AWS_CREDS
                 ]]) {
-
                     sh '''
                         cd module/aws/csv-to-dynamodb-job
 
                         pip install -r requirements.txt
-
                         python load_to_dynamodb.py
                     '''
                 }
             }
         }
+
     }
 }
