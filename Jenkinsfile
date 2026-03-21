@@ -60,11 +60,12 @@ pipeline {
                         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
                         PROJECT=csvtodynamo
 
-                        aws s3 sync . s3://csvtodynamo-dev-371104900437-repo \
+                        aws s3 sync module/ s3://csvtodynamo-dev-371104900437-repo/module/ \
                             --exclude ".terragrunt-cache/*" \
+                            --exclude "**/.terragrunt-cache/*" \
                             --exclude ".terraform/*" \
-                            --exclude "*.tfstate*" \
-                            --exclude ".git/*"
+                            --exclude "**/.terraform/*" \
+                            --exclude "*.tfstate*"
                     '''
                 }
             }
