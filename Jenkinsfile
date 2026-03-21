@@ -30,7 +30,7 @@ pipeline {
                     credentialsId: env.AWS_CREDS
                 ]]) {
                     sh '''
-                        cd module/aws/dynamodb-table
+                        cd module/dynamodb-table
                         terragrunt apply -auto-approve
 
                         cd ../s3-repo-replica
@@ -60,7 +60,7 @@ pipeline {
                     credentialsId: env.AWS_CREDS
                 ]]) {
                     sh '''
-                        cd module/aws/csv-to-dynamodb-job
+                        cd module/csv-to-dynamodb-job
 
                         pip install -r requirements.txt
                         python load_to_dynamodb.py
