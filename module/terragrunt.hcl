@@ -20,4 +20,9 @@ remote_state {
     dynamodb_table = "tf-lock-${local.account_id}"
     encrypt        = true
   }
+
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite"
+  }
 }
