@@ -56,7 +56,11 @@ pipeline {
                 ]) {
                     sh '''
                         set -e
-                        aws s3 sync . s3://repo-replica-$TF_VAR_env/
+
+                        ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+                        PROJECT=csvtodynamo
+
+                        aws s3 sync . s3://${PROJECT}-${TF_VAR_env}-${ACCOUNT_ID}-repo
                     '''
                 }
             }
