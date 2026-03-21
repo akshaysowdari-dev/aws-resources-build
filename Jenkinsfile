@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        TF_VAR_env = 'dev'
+        AWS_CREDS = 'aws-dev-creds'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -12,15 +17,6 @@ pipeline {
         stage('Set Env') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'develop') {
-                        env.TF_VAR_env = 'dev'
-                        env.AWS_CREDS = 'aws-dev-creds'
-                    } 
-                    else {
-                        error "Unsupported branch: ${env.BRANCH_NAME}"
-                    }
-
-                    echo "Branch: ${env.BRANCH_NAME}"
                     echo "Env: ${env.TF_VAR_env}"
                     echo "AWS Creds: ${env.AWS_CREDS}"
                 }
@@ -72,6 +68,5 @@ pipeline {
                 }
             }
         }
-
     }
 }
