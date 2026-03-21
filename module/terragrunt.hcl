@@ -3,13 +3,6 @@ locals {
   account_id  = get_aws_account_id()
 }
 
-inputs = {
-  env        = local.common_vars.inputs.env
-  region     = local.common_vars.inputs.region
-  project    = local.common_vars.inputs.project
-  account_id = local.account_id
-}
-
 remote_state {
   backend = "s3"
 

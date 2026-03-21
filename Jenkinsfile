@@ -32,10 +32,14 @@ pipeline {
                     ]
                 ]) {
                     sh '''
+                        set -e
+
                         cd module/dynamodb-table
+                        terragrunt init -reconfigure
                         terragrunt apply -auto-approve
 
                         cd ../s3-repo-replica
+                        terragrunt init -reconfigure
                         terragrunt apply -auto-approve
                     '''
                 }
@@ -51,6 +55,7 @@ pipeline {
                     ]
                 ]) {
                     sh '''
+                        set -e
                         aws s3 sync . s3://repo-replica-$TF_VAR_env/
                     '''
                 }
@@ -66,8 +71,9 @@ pipeline {
                     ]
                 ]) {
                     sh '''
-                        cd module/csv-to-dynamodb-job
+                        set -e
 
+                        cd module/csv-to-dynamodb-job
                         pip install -r requirements.txt
                         python load_to_dynamodb.py
                     '''

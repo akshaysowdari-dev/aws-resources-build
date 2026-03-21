@@ -1,3 +1,3 @@
 output "table_name" {
-  value = aws_dynamodb_table.table.name
+  value = aws_dynamodb_table.example.name
 }
