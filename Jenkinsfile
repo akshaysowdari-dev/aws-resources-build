@@ -1,15 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11'
-            args '-u root'  
-        }
-    }
+    agent any
 
     environment {
         TF_VAR_env = 'dev'
         AWS_CREDS = 'aws-dev-creds'
-        PROJECT = 'csvtodynamo'
     }
 
     stages {
@@ -17,6 +11,15 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Set Env') {
+            steps {
+                script {
+                    echo "Env: ${env.TF_VAR_env}"
+                    echo "AWS Creds: ${env.AWS_CREDS}"
+                }
             }
         }
 
@@ -30,17 +33,6 @@ pipeline {
                 ]) {
                     sh '''
                         set -e
-
-                        apt-get update && apt-get install -y curl unzip awscli
-
-                        # install terraform
-                        curl -LO https://releases.hashicorp.com/terraform/1.6.6/terraform_1.6.6_linux_amd64.zip
-                        unzip terraform_1.6.6_linux_amd64.zip
-                        mv terraform /usr/local/bin/
-
-                        # install terragrunt
-                        curl -Lo /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/latest/download/terragrunt_linux_amd64
-                        chmod +x /usr/local/bin/terragrunt
 
                         cd module/dynamodb-table
                         terragrunt init -reconfigure
@@ -66,14 +58,14 @@ pipeline {
                         set -e
 
                         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+                        PROJECT=csvtodynamo
 
-                        aws s3 sync module/ s3://${PROJECT}-${TF_VAR_env}-${ACCOUNT_ID}-repo/module/ \
+                        aws s3 sync module/ s3://csvtodynamo-dev-371104900437-repo/module/ \
                             --exclude ".terragrunt-cache/*" \
                             --exclude "**/.terragrunt-cache/*" \
                             --exclude ".terraform/*" \
                             --exclude "**/.terraform/*" \
-                            --exclude "*.tfstate*" \
-                            --exclude ".git/*"
+                            --exclude "*.tfstate*"
                     '''
                 }
             }
@@ -91,11 +83,13 @@ pipeline {
                         set -e
 
                         cd module/csv-to-dynamodb-job
+                        
+                        command -v pip3 || (apt-get update && apt-get install -y python3-pip)
+                        
+                        python3 -m pip install --upgrade pip
+                        python3 -m pip install -r requirements.txt
 
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-
-                        python load_to_dynamodb.py
+                        python3 load_to_dynamodb.py
                     '''
                 }
             }
