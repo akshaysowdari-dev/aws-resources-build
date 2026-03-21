@@ -1,3 +1,4 @@
-variable "table_name" {
-  type = string
-}
+variable "env" {}
+variable "region" {}
+variable "project" {}
+variable "account_id" {}

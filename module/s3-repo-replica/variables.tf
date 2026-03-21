@@ -1,3 +1,4 @@
-variable "env" {
-  type = string
-}
+variable "env" {}
+variable "region" {}
+variable "project" {}
+variable "account_id" {}

@@ -23,7 +23,7 @@ pipeline {
             }
         }
 
-        stage('Create S3 Bucket (Safe)') {
+        stage('Create S3 Bucket (Dynamic & Safe)') {
             steps {
                 withCredentials([
                     [
@@ -32,9 +32,15 @@ pipeline {
                     ]
                 ]) {
                     sh '''
-                        if ! aws s3 ls s3://akshay-tf-state 2>/dev/null; then
+                        ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+                        BUCKET_NAME="akshay-${TF_VAR_env}-${ACCOUNT_ID}-tf-state"
+
+                        echo "Using bucket: $BUCKET_NAME"
+
+                        if ! aws s3 ls s3://$BUCKET_NAME 2>/dev/null; then
                             echo "Bucket does not exist. Creating..."
-                            aws s3 mb s3://akshay-tf-state --region us-east-1
+                            aws s3 mb s3://$BUCKET_NAME --region us-east-1
                         else
                             echo "Bucket already exists"
                         fi
