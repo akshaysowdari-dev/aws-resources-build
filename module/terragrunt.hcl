@@ -1,5 +1,5 @@
 locals {
-  common_vars = read_tfvars_file("${get_terragrunt_dir()}/common.tfvars")
+  common_vars = read_tfvars_file("${get_parent_terragrunt_dir()}/common.tfvars")
   account_id = get_aws_account_id()
 }
 
