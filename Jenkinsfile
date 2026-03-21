@@ -23,12 +23,34 @@ pipeline {
             }
         }
 
+        stage('Create S3 Bucket (Safe)') {
+            steps {
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: env.AWS_CREDS
+                    ]
+                ]) {
+                    sh '''
+                        if ! aws s3 ls s3://akshay-tf-state 2>/dev/null; then
+                            echo "Bucket does not exist. Creating..."
+                            aws s3 mb s3://akshay-tf-state --region us-east-1
+                        else
+                            echo "Bucket already exists"
+                        fi
+                    '''
+                }
+            }
+        }
+
         stage('Deploy Infra') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: env.AWS_CREDS
-                ]]) {
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: env.AWS_CREDS
+                    ]
+                ]) {
                     sh '''
                         cd module/dynamodb-table
                         terragrunt apply -auto-approve
@@ -42,10 +64,12 @@ pipeline {
 
         stage('Upload Repo to S3') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: env.AWS_CREDS
-                ]]) {
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: env.AWS_CREDS
+                    ]
+                ]) {
                     sh '''
                         aws s3 sync . s3://repo-replica-$TF_VAR_env/
                     '''
@@ -55,10 +79,12 @@ pipeline {
 
         stage('Load CSV to DynamoDB') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: env.AWS_CREDS
-                ]]) {
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: env.AWS_CREDS
+                    ]
+                ]) {
                     sh '''
                         cd module/csv-to-dynamodb-job
 
