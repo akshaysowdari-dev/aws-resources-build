@@ -42,7 +42,7 @@ pipeline {
                             echo "Bucket does not exist. Creating..."
                             aws s3 mb s3://$BUCKET_NAME --region us-east-1
                         else
-                            echo "Bucket already exists"
+                            echo "Bucket already existsss"
                         fi
                     '''
                 }
