@@ -16,10 +16,10 @@ pipeline {
                         env.TF_VAR_env = 'dev'
                         env.AWS_CREDS = 'aws-dev-creds'
                     } 
-                    else if (env.BRANCH_NAME == 'qa') {
-                        env.TF_VAR_env = 'qa'
-                        env.AWS_CREDS = 'aws-qa-creds'
-                    } 
+                    // else if (env.BRANCH_NAME == 'qa') {
+                    //     env.TF_VAR_env = 'qa'
+                    //     env.AWS_CREDS = 'aws-qa-creds'
+                    // } 
                     else {
                         error "Unsupported branch: ${env.BRANCH_NAME}"
                     }
