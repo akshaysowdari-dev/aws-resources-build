@@ -13,9 +13,9 @@ inputs = {
 remote_state {
   backend = "s3"
   config = {
-    bucket         = "${local.common_vars.inputs.project}-${local.common_vars.inputs.env}-${local.common_vars.inputs.account_id}-tf-state"
+    bucket         = "${local.common_vars.inputs.project}-${local.common_vars.inputs.env}-${local.account_id}-tf-state"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.common_vars.inputs.region
-    dynamodb_table = "tf-lock-${local.common_vars.inputs.account_id}"
+    dynamodb_table = "tf-lock-${local.account_id}"
   }
 }
