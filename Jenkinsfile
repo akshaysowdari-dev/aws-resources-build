@@ -60,7 +60,11 @@ pipeline {
                         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
                         PROJECT=csvtodynamo
 
-                        aws s3 sync . s3://${PROJECT}-${TF_VAR_env}-${ACCOUNT_ID}-repo
+                        aws s3 sync . s3://csvtodynamo-dev-371104900437-repo \
+                            --exclude ".terragrunt-cache/*" \
+                            --exclude ".terraform/*" \
+                            --exclude "*.tfstate*" \
+                            --exclude ".git/*"
                     '''
                 }
             }
@@ -78,8 +82,8 @@ pipeline {
                         set -e
 
                         cd module/csv-to-dynamodb-job
-                        pip install -r requirements.txt
-                        python load_to_dynamodb.py
+                        python3 -m pip install -r requirements.txt
+                        python3 load_to_dynamodb.py
                     '''
                 }
             }
