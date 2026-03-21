@@ -83,6 +83,8 @@ pipeline {
                         set -e
 
                         cd module/csv-to-dynamodb-job
+                        python3 -m ensurepip || true
+                        python3 -m pip install --upgrade pip
                         python3 -m pip install -r requirements.txt
                         python3 load_to_dynamodb.py
                     '''
