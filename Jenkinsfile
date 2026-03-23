@@ -59,7 +59,7 @@ pipeline {
 
                         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
                         PROJECT=csvtodynamo
-                        S3_BUCKET="${var.project}-${var.env}-${var.account_id}-repo-adjusted"
+                        S3_BUCKET="${var.project}-${var.env}-${var.account_id}-repo"
 
                         aws s3 sync . s3://${S3_BUCKET}/ \
                             --exclude ".terragrunt-cache/*" \
