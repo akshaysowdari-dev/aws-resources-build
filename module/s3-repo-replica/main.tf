@@ -3,5 +3,5 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "repo" {
-  bucket = "${var.project}-${var.env}-${var.account_id}-repo"
+  bucket = ${var.bucket_name}
 }
