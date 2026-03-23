@@ -69,7 +69,7 @@ pipeline {
                             --exclude "**/.terragrunt-cache/*" \
                             --exclude ".terraform/*" \
                             --exclude "**/.terraform/*" \
-                            --exclude "*.tfstate*"
+                            --exclude "*.tfstate*" \
                             --exclude "*.tfvars" \
                             --exclude "node_modules/*" \
                             --exclude ".DS_Store" \
