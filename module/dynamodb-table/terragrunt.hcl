@@ -6,6 +6,9 @@ terraform {
   source = "./"
 }
 
-inputs = {
-  table_name = "${project}-${env}-${account_id}-MCT-adjusted"
-}
+inputs = merge(
+  local.include.inputs,  # Inherits: env, region, project, account_id from parent
+  {
+    table_name = "${local.include.inputs.project}-${local.include.inputs.env}-${local.include.inputs.account_id}-MCT-adjusted"
+  }
+)
