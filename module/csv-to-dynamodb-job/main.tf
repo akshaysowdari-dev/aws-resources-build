@@ -49,7 +49,7 @@ resource "aws_iam_role_policy" "lambda_extra" {
       {
         Effect = "Allow",
         Action = ["s3:GetObject"],
-        Resource = "${aws_s3_bucket.csv_store.arn}/*"
+        Resource = "arn:aws:s3:::${var.csv_bucket_name}/*"
       },
       {
         Effect = "Allow",
@@ -96,14 +96,14 @@ resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.this.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.csv_store.arn
+  source_arn    = "arn:aws:s3:::${var.csv_bucket_name}"
 }
 
 # -------------------------------
 # S3 Trigger → Lambda
 # -------------------------------
 resource "aws_s3_bucket_notification" "trigger" {
-  bucket = aws_s3_bucket.csv_store.id
+  bucket = var.csv_bucket_name
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.this.arn

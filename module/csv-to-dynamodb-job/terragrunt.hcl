@@ -11,4 +11,9 @@ terraform {
   source = "./"
 }
 
-inputs = local.parent_inputs
+inputs = merge(
+  local.parent_inputs,
+  {
+    csv_bucket_name = "${local.parent_inputs.project}-${local.parent_inputs.env}-${local.parent_inputs.account_id}-store-csv"
+  }
+)
