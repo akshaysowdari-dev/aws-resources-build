@@ -4,6 +4,7 @@ pipeline {
     environment {
         TF_VAR_env = 'dev'
         AWS_CREDS = 'aws-dev-creds'
+        PROJECT = 'csvtodynamo'
     }
 
     stages {
@@ -39,6 +40,10 @@ pipeline {
                         terragrunt apply -auto-approve
 
                         cd ../s3-repo-replica
+                        terragrunt init -reconfigure
+                        terragrunt apply -auto-approve
+
+                        cd ../csv-to-dynamodb-job
                         terragrunt init -reconfigure
                         terragrunt apply -auto-approve
                     '''
@@ -79,30 +84,26 @@ pipeline {
             }
         }
 
-        // stage('Load CSV to DynamoDB') {
-        //     steps {
-        //         withCredentials([
-        //             [
-        //                 $class: 'AmazonWebServicesCredentialsBinding',
-        //                 credentialsId: env.AWS_CREDS
-        //             ]
-        //         ]) {
-        //             sh '''
-        //                 set -e
+        stage('Upload CSV to S3') {
+            steps {
+                withCredentials([
+                    [
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: env.AWS_CREDS
+                    ]
+                ]) {
+                    sh '''
+                        set -e
 
-        //                 cd module/csv-to-dynamodb-job
-                        
-        //                 command -v pip3 || (apt-get update && apt-get install -y python3-pip)
-                        
-        //                 python3 -m pip install --upgrade pip
-        //                 python3 -m pip install -r requirements.txt
+                        ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+                        PROJECT=csvtodynamo
+                        S3_BUCKET="${PROJECT}-${TF_VAR_env}-${ACCOUNT_ID}-store-csv"
 
-        //                 python3 load_to_dynamodb.py
-        //             '''
-        //         }
-        //     }
-        // }
+                        aws s3 cp unemployment_rate_by_age_groups.csv \
+                        s3://${S3_BUCKET}/
+                    '''
+                }
+            }
+        }
     }
 }
-
-

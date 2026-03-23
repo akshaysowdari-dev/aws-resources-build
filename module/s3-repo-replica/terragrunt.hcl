@@ -15,6 +15,7 @@ terraform {
 inputs = merge(
   local.parent_inputs,  # Inherit: env, region, project, account_id
   {
-    bucket_name = "${local.parent_inputs.project}-${local.parent_inputs.env}-${local.parent_inputs.account_id}-repo"
+    bucket_name1 = "${local.parent_inputs.project}-${local.parent_inputs.env}-${local.parent_inputs.account_id}-repo",
+    bucket_name2 = "${local.parent_inputs.project}-${local.parent_inputs.env}-${local.parent_inputs.account_id}-store-csv",
   }
 )
