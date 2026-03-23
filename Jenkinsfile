@@ -34,16 +34,23 @@ pipeline {
                 ]) {
                     sh '''
                         set -e
+                        
+                        # Clean cache (VERY IMPORTANT)
+                        rm -rf .terragrunt-cache
 
                         cd module/dynamodb-table
                         terragrunt init -reconfigure
                         terragrunt apply -auto-approve
 
-                        cd ../s3-repo-replica
+                        cd ../../
+
+                        cd module/s3-repo-replica
                         terragrunt init -reconfigure
                         terragrunt apply -auto-approve
 
-                        cd ../csv-to-dynamodb-job
+                        cd ../../
+
+                        cd module/csv-to-dynamodb-job
                         terragrunt init -reconfigure
                         terragrunt apply -auto-approve
                     '''
