@@ -1,5 +1,5 @@
 locals {
-  common_vars = read_terragrunt_config(find_in_parent_folders("common.tfvars"))
+  common_vars = read_terragrunt_config("common.tfvars")
   account_id  = get_aws_account_id()
 }
 
