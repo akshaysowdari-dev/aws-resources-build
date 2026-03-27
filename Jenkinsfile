@@ -190,7 +190,7 @@ def deployAllModules(environment) {
 
         rm -rf .terragrunt-cache
 
-        terragrunt run-all apply -- -auto-approve
+        terragrunt run --all apply -- -auto-approve
     """
 }
 
