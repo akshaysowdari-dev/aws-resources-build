@@ -190,11 +190,7 @@ def deployAllModules(environment) {
 
         rm -rf .terragrunt-cache
 
-        terragrunt run-all apply \
-            --terragrunt-non-interactive \
-            --terragrunt-log-level error \
-            -- \
-            -auto-approve
+        terragrunt run-all apply -- -auto-approve
     """
 }
 
