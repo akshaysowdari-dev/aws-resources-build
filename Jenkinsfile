@@ -190,7 +190,16 @@ def deployAllModules(environment) {
 
         rm -rf .terragrunt-cache
 
-        terragrunt run --all apply -- -auto-approve
+        for module in \
+            module/dynamodb-table \
+            module/s3-repo-replica \
+            module/csv-to-dynamodb-job
+        do
+            echo "Deploying module: \$module"
+
+            terragrunt run --working-dir \$module init -reconfigure
+            terragrunt run --working-dir \$module apply -- -auto-approve
+        done
     """
 }
 
