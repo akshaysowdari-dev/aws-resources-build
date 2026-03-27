@@ -197,7 +197,7 @@ def deployAllModules(environment) {
         do
             echo "Deploying module: \$module"
 
-            terragrunt run --working-dir \$module init -reconfigure
+            terragrunt run --working-dir \$module init -- -reconfigure
             terragrunt run --working-dir \$module apply -- -auto-approve
         done
     """
