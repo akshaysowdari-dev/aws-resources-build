@@ -231,11 +231,12 @@ def uploadCSV(environment) {
         set -e
 
         S3_BUCKET="${PROJECT}-${environment}-${env.ACCOUNT_ID}-store-csv"
-
         CSV_FILE="unemployment_rate_by_age_groups.csv"
 
-        if [ -f "$CSV_FILE" ]; then
-            aws s3 cp $CSV_FILE s3://\${S3_BUCKET}/ --only-show-errors
+        echo "Uploading CSV to: \$S3_BUCKET"
+
+        if [ -f "\$CSV_FILE" ]; then
+            aws s3 cp "\$CSV_FILE" s3://\${S3_BUCKET}/ --only-show-errors
         else
             echo "CSV file not found, skipping upload"
         fi
