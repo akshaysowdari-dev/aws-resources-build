@@ -64,7 +64,7 @@ resource "aws_iam_role_policy" "lambda_extra" {
 # Lambda Function
 # -------------------------------
 resource "aws_lambda_function" "this" {
-  function_name = "${var.project}-${var.env}-lambda"
+  function_name = "${var.project}-${var.env}-lambda-func"
 
   role    = aws_iam_role.lambda_exec.arn
   handler = "load_to_dynamodb.lambda_handler"
