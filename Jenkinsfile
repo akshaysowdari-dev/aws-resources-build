@@ -112,7 +112,7 @@ def getAwsCreds(environment) {
         case 'prod':
             return 'aws-prod-creds'
         default:
-            error "No AWS credentials mapped for ${environment}"
+            error "No AWS credentialss mapped for ${environment}"
     }
 }
 
