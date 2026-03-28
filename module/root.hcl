@@ -1,18 +1,29 @@
-inputs = {
-  env        = "dev"
+locals {
+  env        = get_env("TF_VAR_env", "dev")
   region     = "ap-south-2"
   project    = "csvtodynamo"
-  account_id = "371104900437"
+
+  account_id = get_env("AWS_ACCOUNT_ID", "")
+
+  bucket_name = "akshay-${local.env}-${local.account_id}-tf-state-001"
+  dynamodb_table = "tf-lock-${local.env}-${local.account_id}"
+}
+
+inputs = {
+  env        = local.env
+  region     = local.region
+  project    = local.project
+  account_id = local.account_id
 }
 
 remote_state {
   backend = "s3"
 
   config = {
-    bucket         = "akshay-dev-371104900437-tf-state-001"
+    bucket         = local.bucket_name
     key            = "${path_relative_to_include()}/terraform.tfstate"
-    region         = "ap-south-2"
-    dynamodb_table = "tf-lock-371104900437"
+    region         = local.region
+    dynamodb_table = local.dynamodb_table
     encrypt        = true
   }
 
