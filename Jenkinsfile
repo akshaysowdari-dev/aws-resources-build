@@ -95,7 +95,6 @@ def getEnvFromBranch(branch) {
             return 'dev'
         case 'test':
             return 'qa'
-        case 'main':
         case 'release':
             return 'prod'
         default:
